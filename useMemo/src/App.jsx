@@ -1,35 +1,87 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React, { useState, useMemo } from 'react';
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+
+function FilteredNumbers() {
+  const [numbers, setNumbers] = useState(
+    Array.from({ length: 20 }, (_, i) => i + 1)
+  );
+  
+  const [filterType, setFilterType] = useState('even');
+  
+  const filterOptions = {
+    even: num => num % 2 === 0,
+    odd: num => num % 2 !== 0,
+    positive: num => num > 0,
+    greaterThanTen: num => num > 10
+  };
+
+  const filtered = useMemo(() => {
+    return numbers.filter(filterOptions[filterType]);
+  }, [numbers, filterType]);
+
+ 
+  const addNumber = () => {
+    const newNumber = numbers.length > 0 
+      ? Math.max(...numbers) + 1 
+      : 1;
+    setNumbers(prev => [...prev, newNumber]);
+  };
+
+  const removeLastNumber = () => {
+    setNumbers(prev => prev.slice(0, -1));
+  };
 
   return (
-    <>
+    <div>
+      <h2>Ejemplo useMemo: Números filtrados</h2>
+      
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h3>Filtro actual: {filterType}</h3>
+        <div>
+          {Object.keys(filterOptions).map(type => (
+            <button 
+              key={type} 
+              onClick={() => setFilterType(type)}
+              style={{ 
+                fontWeight: filterType === type ? 'bold' : 'normal',
+                margin: '0 5px'
+              }}
+            >
+              {type === 'even' ? 'Pares' : 
+               type === 'odd' ? 'Impares' : 
+               type === 'positive' ? 'Positivos' : 
+               'Mayor que 10'}
+            </button>
+          ))}
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+
+      <div>
+        <button onClick={addNumber}>Agregar Número</button>
+        <button onClick={removeLastNumber}>Eliminar Último</button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <div>
+        <p>Números totales: {numbers.length}</p>
+        <p>Números filtrados: {filtered.length}</p>
+      </div>
+
+      <ul>
+        {filtered.map((num, index) => (
+          <li 
+            key={`${num}-${index}`} 
+            style={{ 
+              color: num % 2 === 0 ? 'blue' : 'red',
+              fontWeight: num > 10 ? 'bold' : 'normal'
+            }}
+          >
+            {num}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default App
+export default FilteredNumbers;
