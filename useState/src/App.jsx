@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import './App.css'
 
 function ToggleSwitch() {
   const [activo, setActivo] = useState(false);
